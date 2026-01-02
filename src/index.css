@@ -10,6 +10,7 @@
   html {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -19,6 +20,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior: none;
+    /* Enable GPU acceleration for smoother scrolling */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 
   #root {
@@ -26,38 +30,64 @@
     max-width: 100vw;
     overflow-x: hidden;
     position: relative;
+    /* GPU acceleration */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
 @layer utilities {
-  /* Enhanced Glass Effects with 3D depth */
+  /* Enhanced Glass Effects - optimized for performance */
   .glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
+    @apply bg-white/10 border border-white/20;
+    /* Reduced backdrop-blur for better performance on low-end devices */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     box-shadow: 
       0 4px 30px rgba(0, 0, 0, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.1),
       inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-    transform-style: preserve-3d;
+    /* GPU acceleration */
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .glass-strong {
-    @apply bg-white/15 backdrop-blur-lg border border-white/30;
+    @apply bg-white/15 border border-white/30;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     box-shadow: 
       0 8px 32px rgba(0, 0, 0, 0.15),
       inset 0 2px 0 rgba(255, 255, 255, 0.15),
       inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-    transform-style: preserve-3d;
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .glass-3d {
-    @apply bg-white/10 backdrop-blur-lg border border-white/25;
+    @apply bg-white/10 border border-white/25;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     box-shadow: 
       0 20px 60px -10px rgba(0, 0, 0, 0.3),
       0 10px 20px -5px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.2),
       inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-    transform-style: preserve-3d;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateZ(0);
+    will-change: transform;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
   .glass-3d:hover {
@@ -86,20 +116,26 @@
     display: none;
   }
 
-  /* 3D Card perspective container */
+  /* 3D Card perspective container - optimized */
   .perspective-container {
     perspective: 1000px;
-    transform-style: preserve-3d;
+    transform: translateZ(0);
   }
 
   .card-3d {
-    transform-style: preserve-3d;
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateZ(0);
+    transition: transform 0.3s ease;
     will-change: transform;
   }
 
   .card-3d:hover {
-    transform: translateZ(20px) rotateX(-2deg) rotateY(2deg);
+    transform: translateZ(20px) translateY(-4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-3d {
+      transition: none;
+    }
   }
 
   /* Shimmer animation */
@@ -146,18 +182,26 @@
     animation: float 4s ease-in-out infinite;
   }
 
-  /* Smooth scale on hover */
+  /* Smooth scale on hover - optimized */
   .hover-lift {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateZ(0);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    will-change: transform;
   }
 
   .hover-lift:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-8px) translateZ(0) scale(1.02);
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
   }
 
   .hover-lift:active {
-    transform: translateY(-2px) scale(0.98);
+    transform: translateY(-2px) translateZ(0) scale(0.98);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hover-lift {
+      transition: none;
+    }
   }
 
   /* Gradient border glow */

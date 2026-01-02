@@ -37,18 +37,18 @@ const BottomNavigation = () => {
 
   const activeIndex = navItems.findIndex(item => isActive(item.path))
 
-  // Generate particles on click
+  // Generate particles on click - reduced for performance
   const createParticles = (x, y) => {
-    const newParticles = Array.from({ length: 8 }, (_, i) => ({
+    const newParticles = Array.from({ length: 4 }, (_, i) => ({
       id: Date.now() + i,
       x,
       y,
-      angle: (i * 45) * (Math.PI / 180),
+      angle: (i * 90) * (Math.PI / 180),
     }))
     setParticles(prev => [...prev, ...newParticles])
     setTimeout(() => {
       setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)))
-    }, 1000)
+    }, 800)
   }
 
   const handleClick = (e, path, index) => {
@@ -77,28 +77,30 @@ const BottomNavigation = () => {
         zIndex: 9999,
       }}
     >
-      {/* Floating Particles */}
+      {/* Floating Particles - optimized */}
       <AnimatePresence>
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
-            className="fixed w-2 h-2 rounded-full bg-accent pointer-events-none"
+            className="fixed w-1.5 h-1.5 rounded-full bg-accent pointer-events-none"
             initial={{ 
-              x: particle.x - 4, 
-              y: particle.y - 4,
+              x: particle.x - 3, 
+              y: particle.y - 3,
               scale: 1,
               opacity: 1,
             }}
             animate={{ 
-              x: particle.x + Math.cos(particle.angle) * 50 - 4,
-              y: particle.y + Math.sin(particle.angle) * 50 - 4,
+              x: particle.x + Math.cos(particle.angle) * 40 - 3,
+              y: particle.y + Math.sin(particle.angle) * 40 - 3,
               scale: 0,
               opacity: 0,
             }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
             style={{
-              boxShadow: '0 0 10px rgba(212, 181, 106, 0.8)',
+              transform: 'translateZ(0)',
+              willChange: 'transform, opacity',
+              boxShadow: '0 0 6px rgba(212, 181, 106, 0.6)',
             }}
           />
         ))}
@@ -106,37 +108,27 @@ const BottomNavigation = () => {
 
       {/* Main Container with unique shape */}
       <div className="relative mx-2 mb-2">
-        {/* Ambient glow behind nav */}
-        <motion.div
-          className="absolute inset-0 rounded-[32px] blur-xl"
-          animate={{
-            background: [
-              'radial-gradient(ellipse at 30% 50%, rgba(212, 181, 106, 0.15) 0%, transparent 50%)',
-              'radial-gradient(ellipse at 70% 50%, rgba(212, 181, 106, 0.15) 0%, transparent 50%)',
-              'radial-gradient(ellipse at 30% 50%, rgba(212, 181, 106, 0.15) 0%, transparent 50%)',
-            ],
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        {/* Outer glow ring */}
+        {/* Simplified outer glow ring */}
         <div 
           className="absolute -inset-[1px] rounded-[32px]"
           style={{
-            background: 'linear-gradient(135deg, rgba(212, 181, 106, 0.3) 0%, transparent 50%, rgba(212, 181, 106, 0.1) 100%)',
+            background: 'linear-gradient(135deg, rgba(212, 181, 106, 0.2) 0%, transparent 50%, rgba(212, 181, 106, 0.05) 100%)',
             padding: '1px',
+            transform: 'translateZ(0)',
           }}
         >
           <div className="w-full h-full rounded-[32px] bg-primary-dark" />
         </div>
 
-        {/* Main navigation bar */}
+        {/* Main navigation bar - optimized blur */}
         <div 
           className="relative rounded-[32px] overflow-hidden"
           style={{
             background: 'linear-gradient(180deg, rgba(53, 76, 71, 0.98) 0%, rgba(31, 46, 42, 0.99) 100%)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            transform: 'translateZ(0)',
+            willChange: 'transform',
             boxShadow: `
               0 -20px 60px -15px rgba(0, 0, 0, 0.4),
               0 20px 60px -15px rgba(0, 0, 0, 0.5),
@@ -146,46 +138,17 @@ const BottomNavigation = () => {
             `,
           }}
         >
-          {/* Animated aurora background */}
-          <div className="absolute inset-0 overflow-hidden rounded-[32px]">
-            <motion.div
-              className="absolute w-[200%] h-[200%] -left-1/2 -top-1/2"
-              animate={{
-                rotate: [0, 360],
-              }}
-              transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-              style={{
-                background: `
-                  conic-gradient(
-                    from 0deg,
-                    transparent,
-                    rgba(212, 181, 106, 0.03) 10%,
-                    transparent 20%,
-                    rgba(127, 195, 126, 0.02) 30%,
-                    transparent 40%,
-                    rgba(212, 181, 106, 0.03) 50%,
-                    transparent 60%,
-                    rgba(96, 165, 250, 0.02) 70%,
-                    transparent 80%,
-                    rgba(212, 181, 106, 0.03) 90%,
-                    transparent
-                  )
-                `,
-              }}
-            />
-          </div>
-
-          {/* Shimmer effect */}
+          {/* Simplified subtle shimmer - removed expensive rotating gradient */}
           <motion.div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none opacity-30"
+            style={{ transform: 'translateZ(0)' }}
             animate={{
               background: [
-                'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%)',
-                'linear-gradient(90deg, transparent 100%, rgba(255,255,255,0.03) 150%, transparent 200%)',
+                'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 50%, transparent 100%)',
+                'linear-gradient(90deg, transparent 100%, rgba(255,255,255,0.02) 150%, transparent 200%)',
               ],
-              x: ['-100%', '100%'],
             }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2 }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 3 }}
           />
 
           {/* Top highlight line */}
@@ -278,61 +241,33 @@ const BottomNavigation = () => {
                     )}
                   </AnimatePresence>
 
-                  {/* Icon with 3D effect */}
+                  {/* Icon - simplified animations */}
                   <motion.div
                     className="relative"
-                    animate={active ? {
-                      y: [0, -4, 0],
-                      rotateY: [0, 10, -10, 0],
-                    } : isHovered ? {
+                    style={{ transform: 'translateZ(0)', willChange: 'transform' }}
+                    animate={isHovered && !active ? {
                       y: -2,
-                      scale: 1.1,
+                      scale: 1.05,
                     } : {
                       y: 0,
                       scale: 1,
                     }}
-                    transition={active ? {
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    } : {
+                    transition={{
                       type: 'spring',
                       stiffness: 300,
+                      damping: 20,
                     }}
-                    style={{ perspective: '100px' }}
                   >
-                    {/* Multi-layer glow for active */}
-                    {active && (
-                      <>
-                        <motion.div
-                          className="absolute inset-0 blur-lg"
-                          animate={{ 
-                            opacity: [0.4, 0.7, 0.4],
-                            scale: [1, 1.3, 1],
-                          }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                        >
-                          <Icon className="w-6 h-6 text-accent" />
-                        </motion.div>
-                        <motion.div
-                          className="absolute inset-0 blur-md"
-                          animate={{ opacity: [0.5, 0.8, 0.5] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                        >
-                          <Icon className="w-6 h-6 text-accent" />
-                        </motion.div>
-                      </>
-                    )}
-                    
-                    {/* Main icon */}
+                    {/* Main icon - simplified glow effects */}
                     <motion.div
+                      style={{ transform: 'translateZ(0)', willChange: 'transform' }}
                       animate={active ? {
-                        rotate: [0, -8, 8, 0],
+                        y: [0, -2, 0],
                       } : {}}
-                      transition={{ duration: 0.5 }}
+                      transition={active ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : {}}
                     >
                       <Icon 
-                        className={`w-6 h-6 relative z-10 transition-all duration-500 ${
+                        className={`w-6 h-6 relative z-10 transition-all duration-300 ${
                           active 
                             ? 'text-accent' 
                             : isHovered
@@ -341,7 +276,7 @@ const BottomNavigation = () => {
                         }`}
                         strokeWidth={active ? 2.5 : 2}
                         style={active ? {
-                          filter: 'drop-shadow(0 0 12px rgba(212, 181, 106, 0.8))',
+                          filter: 'drop-shadow(0 0 8px rgba(212, 181, 106, 0.6))',
                         } : {}}
                       />
                     </motion.div>
